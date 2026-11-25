@@ -99,7 +99,7 @@ const BODY_HTML = `
         <p class="event-subtitle">02 दिसम्बर 2026 (बुधवार)</p>
         <h3 class="event-title shimmer-gold">तिलकोत्सव एवं धनवटी</h3>
         <div class="event-info-box">
-          <div class="info-row loc"><span class="ico">📍</span><span><b>स्थान:</b> हाउस नं. 22, रोड नं. - 1, शास्त्री नगर, ब्लॉक - 4, कदमा, जमशेदपुर</span></div>
+          <div class="info-row loc"><span class="ico">📍</span><span><b>स्थान:</b> शीवपुर हजरारा हावराह, वेस्ट बंगाल</span></div>
         </div>
       </div>
       <div class="event-media"><div class="event-img-wrap"><img src="images/ghudchadi.webp" alt="तिलकोत्सव एवं धनवटी" loading="lazy"></div></div>
