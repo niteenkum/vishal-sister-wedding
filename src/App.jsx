@@ -3,20 +3,63 @@ import { useEffect, useRef } from "react";
 const BODY_HTML = `
 <!-- ENTRY GATE -->
 <div class="entry-video-container" id="entry-gate">
-  <video id="entry-video" src="media/reveal1.mp4" playsinline muted preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s ease;pointer-events:none;z-index:5"></video>
+  <div class="gate-toran"></div>
   <div class="gate-mandala"></div>
-  <div class="env-card">
-    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-    <div class="env-flap"></div>
-    <div class="wax-seal"><span class="wax-seal-monogram">R &amp; R</span></div>
-    <div class="env-body-text">
-      <div class="env-ornament">— ✦ —</div>
-      <h1 class="env-shubh">शुभ विवाह</h1>
-      <div class="env-ornament">— ❀ —</div>
-      <p class="env-names">रोहिनी एवं रबि</p>
-    </div>
-    <div class="tap-hint" id="tap-hint">▶ आमंत्रण खोलने के लिए टैप करें</div>
+  <div class="gate-mandala inner"></div>
+  <span class="gate-corner tl"></span>
+  <span class="gate-corner tr"></span>
+  <span class="gate-corner bl"></span>
+  <span class="gate-corner br"></span>
+
+  <div class="gate-side left">
+    <span class="gate-side-orn">✦ ❀ ✦</span>
+    <p class="gate-side-sub">पावन परिणय</p>
+    <h2 class="gate-side-title">रोहिनी <span>संग</span> रबि</h2>
+    <p class="gate-side-line">स्नेहिल आमंत्रण</p>
   </div>
+
+  <div class="entry-stage" id="entry-stage">
+    <div class="entry-video-frame" id="entry-card">
+      <video id="entry-video" src="media/reveal1.mp4" playsinline webkit-playsinline muted preload="auto"></video>
+      <div class="card-sheen" id="card-sheen"></div>
+      <div class="card-inner-border"></div>
+
+      <div class="gate-top-pill">॥ श्री गणेशाय नमः ॥</div>
+
+      <button type="button" class="seal-hotspot" id="seal-hotspot" aria-label="शाही मुहर खोलें">
+        <span class="seal-glow"></span>
+        <span class="seal-ring r1"></span>
+        <span class="seal-ring r2"></span>
+        <span class="seal-ring r3"></span>
+        <span class="seal-orbit">
+          <i class="gem g1">✦</i>
+          <i class="gem g2">✦</i>
+          <i class="gem g3">✦</i>
+          <i class="gem g4">✦</i>
+        </span>
+        <span class="seal-shine"></span>
+      </button>
+
+      <div class="gate-cta-wrap" id="tap-hint">
+        <div class="gate-cta-btn" id="gate-cta-btn">
+          <span class="cta-sparkle">✨</span>
+          <span class="cta-text" id="cta-text">मुहर पर टैप करें — आमंत्रण खोलें</span>
+          <span class="cta-music" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+        <p class="gate-cta-sub">संगीत एवं शाही आमंत्रण के लिए क्लिक करें</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gate-side right">
+    <span class="gate-side-orn">✦ ❀ ✦</span>
+    <p class="gate-side-sub">शुभ विवाह</p>
+    <h2 class="gate-side-title">09 दिसम्बर 2026</h2>
+    <p class="gate-side-line">कदमा, जमशेदपुर</p>
+  </div>
+
+  <canvas class="gate-fx-canvas" id="gate-fx-canvas"></canvas>
+  <div class="gate-flash" id="gate-flash"></div>
 </div>
 
 <audio id="bg-audio" src="media/bg_music.mp3" loop preload="auto"></audio>
@@ -33,10 +76,13 @@ const BODY_HTML = `
   <!-- HERO -->
   <section id="hero">
     <img class="hero-img" src="images/couple.webp" alt="नवदंपत्ति">
-    <div class="scroll-cue">
-      <p>Scroll</p>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
+    <button type="button" class="scroll-cue" id="scroll-cue" aria-label="नीचे स्क्रॉल करें">
+      <span class="scroll-cue-ring"></span>
+      <span class="scroll-cue-text">नीचे स्क्रॉल करें</span>
+      <span class="scroll-cue-arrows" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 6 12 12 18 6"/><polyline points="6 13 12 19 18 13"/></svg>
+      </span>
+    </button>
   </section>
 
   <!-- BLESSINGS & FAMILY -->
@@ -227,8 +273,798 @@ export default function App() {
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
-    const fn = new Function("(function(){\n  'use strict';\n\n  /* ---------- CONFIG ---------- */\n  var WEDDING_DATE = new Date('2026-12-09T19:00:00+05:30').getTime();\n  const GOOGLE_SHEET_URL = \"https://script.google.com/macros/s/AKfycbwVx7LZdmT_uR6wMEiU2MUlZAFM0EcGDTPlT1J2QkMdGKNS2dOAxUeIBhSRTqR2wyYU/exec\";\n\n  var confCanvas = document.getElementById('confetti-canvas');\n  var cf = (window.confetti && window.confetti.create)\n    ? window.confetti.create(confCanvas, {resize:true, useWorker:false})\n    : function(){};\n\n  var gate = document.getElementById('entry-gate');\n    var audio = document.getElementById('bg-audio');\n  var audioBtn = document.getElementById('audio-btn');\n  var iconOn = document.getElementById('icon-on');\n  var iconOff = document.getElementById('icon-off');\n  var main = document.getElementById('main-content');\n  var petalsCanvas = document.getElementById('petals-canvas');\n  var opened = false;\n\n  /* ---------- ENTRY GATE ---------- */\n  function setAudioIcon(playing){\n    iconOn.style.display = playing ? '' : 'none';\n    iconOff.style.display = playing ? 'none' : '';\n  }\n  function openInvite(){\n    if (opened) return;\n    opened = true;\n    if (audio.paused){\n      audio.volume = 0.6;\n      var p = audio.play();\n      if (p && p.then) p.then(function(){ setAudioIcon(true); }).catch(function(){ setAudioIcon(false); });\n    } else {\n      setAudioIcon(true);\n    }\n    audioBtn.classList.add('show');\n    main.classList.add('show');\n    document.body.classList.remove('locked');\n    window.scrollTo(0,0);\n    gate.classList.add('hide');\n    setTimeout(function(){ gate.style.display = 'none';  }, 900);\n    petalsCanvas.classList.add('active');\n    Petals.start();\n    ConfettiRain.start();\n    observeReveals();\n  }\n\n  var started = false;\n  var entryVideo = document.getElementById('entry-video');\n  function startEnvelope(){\n    if (started) return;\n    started = true;\n    gate.classList.add('opening');\n    audio.volume = 0.6;\n    var ap = audio.play();\n    if (ap && ap.then) ap.then(function(){ setAudioIcon(true); }).catch(function(){ setAudioIcon(false); });\n    if (entryVideo){\n      entryVideo.style.opacity = '1';\n      var vp = entryVideo.play();\n      if (vp && vp.catch) vp.catch(function(){});\n      entryVideo.addEventListener('ended', openInvite, {once:true});\n      setTimeout(openInvite, 4000);\n    } else {\n      setTimeout(openInvite, 950);\n    }\n  }\n  gate.addEventListener('click', startEnvelope);\n\n  audioBtn.addEventListener('click', function(){\n    if (audio.paused){ audio.play(); setAudioIcon(true); }\n    else { audio.pause(); setAudioIcon(false); }\n  });\n\n  /* ---------- SCROLL REVEAL ---------- */\n  function observeReveals(){\n    var els = document.querySelectorAll('.reveal');\n    if (!('IntersectionObserver' in window)){ els.forEach(function(e){ e.classList.add('revealed'); }); return; }\n    var io = new IntersectionObserver(function(entries){\n      entries.forEach(function(en){\n        if (en.isIntersecting){ en.target.classList.add('revealed'); io.unobserve(en.target); }\n      });\n    }, {threshold:0.12});\n    els.forEach(function(e){ io.observe(e); });\n  }\n\n  /* ---------- PETALS (lightweight, max 18) ---------- */\n  var Petals = (function(){\n    var canvas = petalsCanvas, ctx = canvas.getContext('2d');\n    var MAX = 18, petals = [], sprites = [], running = false, last = 0, w = 0, h = 0, dpr = 1;\n    var colors = ['#F5C2C7','#F9D6DA','#F0CF8E','#F7B733','#E58C9B','#FCEFCF'];\n\n    function makeSprite(color){\n      var s = 40, c = document.createElement('canvas');\n      c.width = s; c.height = s;\n      var g = c.getContext('2d');\n      g.translate(s/2, s/2);\n      var grad = g.createLinearGradient(0,-16,0,16);\n      grad.addColorStop(0, color);\n      grad.addColorStop(1, 'rgba(255,255,255,0.75)');\n      g.fillStyle = grad;\n      g.globalAlpha = 0.9;\n      g.beginPath();\n      g.moveTo(0,-16);\n      g.bezierCurveTo(12,-10,12,8,0,16);\n      g.bezierCurveTo(-12,8,-12,-10,0,-16);\n      g.fill();\n      return c;\n    }\n    colors.forEach(function(c){ sprites.push(makeSprite(c)); });\n\n    function resize(){\n      dpr = Math.min(window.devicePixelRatio || 1, 2);\n      w = canvas.clientWidth; h = canvas.clientHeight;\n      canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);\n      ctx.setTransform(dpr,0,0,dpr,0,0);\n    }\n    function spawn(initial){\n      return {\n        x: Math.random()*w,\n        y: initial ? Math.random()*h : -30,\n        size: 10 + Math.random()*10,\n        vy: 12 + Math.random()*16,\n        sway: 14 + Math.random()*22,\n        swaySpeed: 0.4 + Math.random()*0.5,\n        phase: Math.random()*Math.PI*2,\n        rot: Math.random()*Math.PI*2,\n        rotSpeed: (Math.random()-0.5)*0.9,\n        sprite: sprites[(Math.random()*sprites.length)|0],\n        alpha: 0.55 + Math.random()*0.35\n      };\n    }\n    function frame(t){\n      if (!running) return;\n      var dt = Math.min((t-last)/1000, 0.05); last = t;\n      ctx.clearRect(0,0,w,h);\n      for (var i=0;i<petals.length;i++){\n        var p = petals[i];\n        p.y += p.vy*dt;\n        p.phase += p.swaySpeed*dt;\n        p.rot += p.rotSpeed*dt;\n        var x = p.x + Math.sin(p.phase)*p.sway;\n        if (p.y > h+30){ petals[i] = p = spawn(false); p.y = -30; }\n        ctx.save();\n        ctx.globalAlpha = p.alpha;\n        ctx.translate(x, p.y);\n        ctx.rotate(p.rot);\n        ctx.scale(1, 0.55 + 0.45*Math.abs(Math.sin(p.phase*0.8)));\n        ctx.drawImage(p.sprite, -p.size/2, -p.size/2, p.size, p.size);\n        ctx.restore();\n      }\n      requestAnimationFrame(frame);\n    }\n    function start(){\n      if (running) return;\n      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;\n      resize();\n      petals = [];\n      for (var i=0;i<MAX;i++) petals.push(spawn(true));\n      running = true; last = performance.now();\n      requestAnimationFrame(frame);\n    }\n    document.addEventListener('visibilitychange', function(){\n      if (document.hidden){ running = false; }\n      else if (opened && !running){ running = true; last = performance.now(); requestAnimationFrame(frame); }\n    });\n    var rt; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ if(opened) resize(); }, 200); });\n    return {start:start};\n  })();\n\n  /* ---------- CONFETTI RAIN (from the very start, from the top) ---------- */\n  var ConfettiRain = (function(){\n    var timer = null, t0 = 0;\n    var cols = ['#C9963E','#F0CF8E','#F5A623','#E58C9B','#F9C6CC','#FFFFFF'];\n    function drop(){\n      var wide = window.innerWidth > 900;\n      var heavy = Date.now() - t0 < 5000;\n      var n = (heavy ? 3 : 1) * (wide ? 2 : 1);\n      for (var i=0;i<n;i++){\n        cf({\n          particleCount:1, angle:270, spread:30,\n          startVelocity:4+Math.random()*5, gravity:0.45+Math.random()*0.25,\n          decay:0.96, drift:(Math.random()-0.5)*1.4, ticks:520,\n          scalar:0.7+Math.random()*0.5,\n          origin:{x:Math.random(), y:-0.05},\n          colors:cols, disableForReducedMotion:true\n        });\n      }\n    }\n    function start(){ if (timer) return; t0 = Date.now(); timer = setInterval(drop, 130); }\n    function stop(){ clearInterval(timer); timer = null; }\n    document.addEventListener('visibilitychange', function(){\n      if (document.hidden) stop(); else if (opened) start();\n    });\n    return {start:start, stop:stop};\n  })();\n\n  /* ---------- SCRATCH HEARTS ---------- */\n  var revealedCount = 0;\n  var containers = document.querySelectorAll('.heart-container');\n\n  function initScratch(container){\n    var canvas = container.querySelector('.scratch-canvas');\n    var ctx = canvas.getContext('2d', {willReadFrequently:true});\n    var done = false, drawing = false, lastPt = null, moves = 0;\n    var W, H;\n\n    function paint(){\n      var rect = container.getBoundingClientRect();\n      var dpr = Math.min(window.devicePixelRatio || 1, 2);\n      W = Math.max(1, Math.round(rect.width*dpr)); H = Math.max(1, Math.round(rect.height*dpr));\n      canvas.width = W; canvas.height = H;\n      var g = ctx.createLinearGradient(0,0,W,H);\n      g.addColorStop(0,'#F0CF8E'); g.addColorStop(0.5,'#C9963E'); g.addColorStop(1,'#F0CF8E');\n      ctx.globalCompositeOperation = 'source-over';\n      ctx.fillStyle = g; ctx.fillRect(0,0,W,H);\n      ctx.fillStyle = 'rgba(255,255,255,0.4)';\n      ctx.font = 'bold ' + Math.round(W*0.16) + 'px serif';\n      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';\n      ctx.fillText('✦ ✦ ✦', W/2, H*0.45);\n    }\n    paint();\n\n    function pos(e){\n      var r = canvas.getBoundingClientRect();\n      return { x:(e.clientX-r.left)*(W/r.width), y:(e.clientY-r.top)*(H/r.height) };\n    }\n    function scratchTo(pt){\n      ctx.globalCompositeOperation = 'destination-out';\n      ctx.lineWidth = W*0.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';\n      ctx.beginPath();\n      if (lastPt){ ctx.moveTo(lastPt.x,lastPt.y); ctx.lineTo(pt.x,pt.y); }\n      else { ctx.moveTo(pt.x,pt.y); ctx.lineTo(pt.x+0.1,pt.y+0.1); }\n      ctx.stroke();\n      lastPt = pt;\n    }\n    function checkCleared(){\n      if (done) return;\n      var data = ctx.getImageData(0,0,W,H).data, total = 0, clear = 0;\n      for (var i=3;i<data.length;i+=64){ total++; if (data[i] < 20) clear++; }\n      if (clear/total > 0.42) finish();\n    }\n    function finish(){\n      if (done) return;\n      done = true;\n      canvas.classList.add('done');\n      container.classList.add('done');\n      if (container.parentNode) container.parentNode.classList.add('done');\n      revealedCount++;\n      if (revealedCount === containers.length) onAllRevealed();\n    }\n    canvas.addEventListener('pointerdown', function(e){\n      if (done) return;\n      drawing = true; lastPt = null;\n      try{ canvas.setPointerCapture(e.pointerId); }catch(_){}\n      scratchTo(pos(e)); e.preventDefault();\n    });\n    canvas.addEventListener('pointermove', function(e){\n      if (!drawing || done) return;\n      scratchTo(pos(e));\n      if ((++moves % 6) === 0) checkCleared();\n      e.preventDefault();\n    });\n    function end(){ if (!drawing) return; drawing = false; lastPt = null; checkCleared(); }\n    canvas.addEventListener('pointerup', end);\n    canvas.addEventListener('pointercancel', end);\n    canvas.addEventListener('pointerleave', end);\n  }\n  containers.forEach(initScratch);\n\n  /* ---------- ALL REVEALED ---------- */\n  function onAllRevealed(){\n    document.getElementById('surprise-message').classList.add('revealed');\n    document.getElementById('countdown').classList.add('revealed');\n    var gold = ['#C9963E','#F0CF8E','#FCEFCF','#F5A623','#E58C9B'];\n    cf({particleCount:110, spread:80, origin:{y:0.6}, colors:gold});\n    setTimeout(function(){ cf({particleCount:60, angle:60, spread:60, origin:{x:0,y:0.7}, colors:gold}); }, 250);\n    setTimeout(function(){ cf({particleCount:60, angle:120, spread:60, origin:{x:1,y:0.7}, colors:gold}); }, 400);\n  }\n\n  var cd = {\n    d:document.getElementById('cd-days'), h:document.getElementById('cd-hours'),\n    m:document.getElementById('cd-mins'), s:document.getElementById('cd-secs')\n  };\n  function pad(n){ return String(n).padStart(2,'0'); }\n  function tick(){\n    var diff = Math.max(0, WEDDING_DATE - Date.now());\n    var s = Math.floor(diff/1000);\n    cd.d.textContent = pad(Math.floor(s/86400));\n    cd.h.textContent = pad(Math.floor((s%86400)/3600));\n    cd.m.textContent = pad(Math.floor((s%3600)/60));\n    var sec = pad(s%60);\n    if (cd.s.textContent !== sec){\n      cd.s.textContent = sec;\n      cd.s.classList.remove('bump'); void cd.s.offsetWidth; cd.s.classList.add('bump');\n    }\n  }\n  tick(); setInterval(tick, 1000);\n\n  /* ---------- RSVP ---------- */\n  var form = document.getElementById('rsvp-form');\n  var modal = document.getElementById('rsvp-modal');\n  var submitBtn = document.getElementById('submit-btn');\n  form.addEventListener('submit', function(e){\n    e.preventDefault();\n    if (!form.reportValidity()) return;\n\n    var defaultBtnText = 'प्यार भेजें ❤️';\n    submitBtn.disabled = true;\n    submitBtn.textContent = 'भेजा जा रहा है...';\n\n    fetch(GOOGLE_SHEET_URL, { method: \"POST\", body: new FormData(form), mode: \"no-cors\" })\n      .then(function(){\n        modal.classList.add('open');\n        form.reset();\n        cf({particleCount:70, spread:70, origin:{y:0.7}, colors:['#C9963E','#F0CF8E','#E58C9B']});\n      })\n      .catch(function(err){\n        console.error('RSVP submit error:', err);\n        alert('कुछ गड़बड़ हो गई। कृपया दोबारा प्रयास करें।');\n      })\n      .then(function(){\n        submitBtn.disabled = false;\n        submitBtn.textContent = defaultBtnText;\n      });\n  });\n  document.getElementById('modal-close').addEventListener('click', function(){ modal.classList.remove('open'); });\n  modal.addEventListener('click', function(e){ if (e.target === modal) modal.classList.remove('open'); });\n})();");
-    fn();
+
+    const WEDDING_DATE = new Date("2026-12-09T19:00:00+05:30").getTime();
+    const GOOGLE_SHEET_URL =
+      "https://script.google.com/macros/s/AKfycbxyPKLRYZ4nVZX_EBjN1Q0J3rt4LodzREEY7lRa2WEH08od3_7iiuzUwVBJoCAx1DuX/exec";
+
+    const confCanvas = document.getElementById("confetti-canvas");
+    const cf =
+      window.confetti && window.confetti.create
+        ? window.confetti.create(confCanvas, { resize: true, useWorker: false })
+        : function () {};
+
+    const gate = document.getElementById("entry-gate");
+    const entryCard = document.getElementById("entry-card");
+    const cardSheen = document.getElementById("card-sheen");
+    const sealHotspot = document.getElementById("seal-hotspot");
+    const ctaText = document.getElementById("cta-text");
+    const gateFlash = document.getElementById("gate-flash");
+    const gateFxCanvas = document.getElementById("gate-fx-canvas");
+    const entryVideo = document.getElementById("entry-video");
+    const audio = document.getElementById("bg-audio");
+    const audioBtn = document.getElementById("audio-btn");
+    const iconOn = document.getElementById("icon-on");
+    const iconOff = document.getElementById("icon-off");
+    const main = document.getElementById("main-content");
+    const petalsCanvas = document.getElementById("petals-canvas");
+    const scrollCue = document.getElementById("scroll-cue");
+
+    let opened = false;
+    let started = false;
+    let startedAt = 0;
+
+    /* ---------- PRIME VIDEO FRAME 0 ---------- */
+    if (entryVideo) {
+      entryVideo.muted = true;
+      const prime = function () {
+        if (!started && entryVideo.currentTime === 0) {
+          try {
+            entryVideo.currentTime = 0.001;
+          } catch (_) {}
+        }
+      };
+      if (entryVideo.readyState >= 1) prime();
+      else entryVideo.addEventListener("loadedmetadata", prime, { once: true });
+    }
+
+    /* ---------- GATE INTERACTIVE SPARKLES + 3D TILT ---------- */
+    const GateFX = (function () {
+      if (!gateFxCanvas) return { burst: function () {}, stop: function () {} };
+      const ctx = gateFxCanvas.getContext("2d");
+      const reduced =
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let w = 0,
+        h = 0,
+        dpr = 1,
+        active = !reduced;
+      const ambient = [];
+      const sparks = [];
+      const palette = ["#FFE8A3", "#F5B942", "#FFFDF5", "#F0CF8E", "#F7A8B8"];
+
+      let targetRX = 0,
+        targetRY = 0,
+        curRX = 0,
+        curRY = 0;
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = window.innerWidth;
+        h = window.innerHeight;
+        gateFxCanvas.width = Math.round(w * dpr);
+        gateFxCanvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      for (let i = 0; i < 32; i++) {
+        ambient.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: 1.2 + Math.random() * 2.4,
+          vy: -(10 + Math.random() * 22),
+          vx: (Math.random() - 0.5) * 12,
+          phase: Math.random() * Math.PI * 2,
+          color: palette[(Math.random() * palette.length) | 0],
+          star: Math.random() > 0.55,
+        });
+      }
+
+      function addSpark(x, y, speedMul) {
+        if (sparks.length > 130) return;
+        const ang = Math.random() * Math.PI * 2;
+        const spd = (25 + Math.random() * 95) * (speedMul || 1);
+        sparks.push({
+          x: x,
+          y: y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd - 18,
+          life: 0,
+          max: 0.55 + Math.random() * 0.55,
+          size: 2 + Math.random() * 3.8,
+          color: palette[(Math.random() * palette.length) | 0],
+        });
+      }
+
+      function burst(x, y) {
+        for (let i = 0; i < 46; i++) addSpark(x, y, 1.85);
+      }
+
+      function drawStar(cx, cy, r, color, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = color;
+        ctx.translate(cx, cy);
+        ctx.beginPath();
+        for (let i = 0; i < 4; i++) {
+          ctx.lineTo(0, -r * 2.1);
+          ctx.lineTo(r * 0.48, -r * 0.48);
+          ctx.rotate(Math.PI / 2);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      let lastMove = 0;
+      gate.addEventListener("pointermove", function (e) {
+        if (opened) return;
+        const now = performance.now();
+        if (now - lastMove > 22) {
+          lastMove = now;
+          addSpark(e.clientX, e.clientY, 0.55);
+        }
+
+        if (!started && entryCard) {
+          const rect = entryCard.getBoundingClientRect();
+          const nx = Math.max(
+            -1,
+            Math.min(1, ((e.clientX - rect.left) / rect.width - 0.5) * 2)
+          );
+          const ny = Math.max(
+            -1,
+            Math.min(1, ((e.clientY - rect.top) / rect.height - 0.5) * 2)
+          );
+          if (window.innerWidth >= 700) {
+            targetRY = nx * 7.5;
+            targetRX = -ny * 6.5;
+          }
+          if (cardSheen) {
+            cardSheen.style.setProperty(
+              "--sx",
+              Math.round(((nx + 1) / 2) * 100) + "%"
+            );
+            cardSheen.style.setProperty(
+              "--sy",
+              Math.round(((ny + 1) / 2) * 100) + "%"
+            );
+          }
+
+          if (sealHotspot) {
+            const sr = sealHotspot.getBoundingClientRect();
+            const sx = sr.left + sr.width / 2;
+            const sy = sr.top + sr.height / 2;
+            const dist = Math.hypot(e.clientX - sx, e.clientY - sy);
+            const isNear = dist < sr.width * 0.85;
+            sealHotspot.classList.toggle("near", isNear);
+            if (ctaText) {
+              ctaText.textContent = isNear
+                ? "🔓 अभी क्लिक करें — आमंत्रण खोलें!"
+                : "मुहर पर टैप करें — आमंत्रण खोलें";
+            }
+            if (isNear && Math.random() > 0.45) {
+              const a = Math.random() * Math.PI * 2;
+              addSpark(
+                sx + (Math.cos(a) * sr.width) / 2,
+                sy + (Math.sin(a) * sr.height) / 2,
+                0.7
+              );
+            }
+          }
+        }
+      });
+
+      gate.addEventListener("pointerleave", function () {
+        targetRX = 0;
+        targetRY = 0;
+        if (sealHotspot) sealHotspot.classList.remove("near");
+        if (ctaText) ctaText.textContent = "मुहर पर टैप करें — आमंत्रण खोलें";
+      });
+
+      let last = performance.now();
+      function loop(t) {
+        if (!active) return;
+        const dt = Math.min((t - last) / 1000, 0.05);
+        last = t;
+        ctx.clearRect(0, 0, w, h);
+
+        if (started) {
+          targetRX = 0;
+          targetRY = 0;
+        }
+        curRX += (targetRX - curRX) * 0.12;
+        curRY += (targetRY - curRY) * 0.12;
+        if (entryCard && (Math.abs(curRX) > 0.02 || Math.abs(curRY) > 0.02)) {
+          entryCard.style.transform =
+            "rotateX(" +
+            curRX.toFixed(2) +
+            "deg) rotateY(" +
+            curRY.toFixed(2) +
+            "deg)";
+        } else if (entryCard && started) {
+          entryCard.style.transform = "none";
+        }
+
+        for (let i = 0; i < ambient.length; i++) {
+          const p = ambient[i];
+          p.y += p.vy * dt;
+          p.x += p.vx * dt + Math.sin(p.phase + t * 0.0015) * 0.25;
+          if (p.y < -12) {
+            p.y = h + 12;
+            p.x = Math.random() * w;
+          }
+          const tw = 0.35 + 0.55 * Math.abs(Math.sin(p.phase + t * 0.0024));
+          if (p.star) {
+            drawStar(p.x, p.y, p.r, p.color, tw);
+          } else {
+            ctx.save();
+            ctx.globalAlpha = tw;
+            ctx.fillStyle = p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+
+        for (let j = sparks.length - 1; j >= 0; j--) {
+          const s = sparks[j];
+          s.life += dt;
+          if (s.life >= s.max) {
+            sparks.splice(j, 1);
+            continue;
+          }
+          s.vy += 90 * dt;
+          s.x += s.vx * dt;
+          s.y += s.vy * dt;
+          const al = 1 - s.life / s.max;
+          drawStar(s.x, s.y, s.size * al, s.color, al);
+        }
+
+        requestAnimationFrame(loop);
+      }
+      if (active) requestAnimationFrame(loop);
+
+      return {
+        burst: burst,
+        stop: function () {
+          active = false;
+          window.removeEventListener("resize", resize);
+        },
+      };
+    })();
+
+    /* ---------- ENTRY GATE OPEN & VIDEO REVEAL ---------- */
+    function setAudioIcon(playing) {
+      iconOn.style.display = playing ? "" : "none";
+      iconOff.style.display = playing ? "none" : "";
+    }
+
+    function openInvite() {
+      if (opened) return;
+      opened = true;
+      GateFX.stop();
+      if (gateFlash) gateFlash.classList.add("bloom");
+      if (audio.paused) {
+        audio.volume = 0.6;
+        const p = audio.play();
+        if (p && p.then)
+          p.then(function () {
+            setAudioIcon(true);
+          }).catch(function () {
+            setAudioIcon(false);
+          });
+      } else {
+        setAudioIcon(true);
+      }
+      audioBtn.classList.add("show");
+      main.classList.add("show");
+      document.body.classList.remove("locked");
+      window.scrollTo(0, 0);
+      if (scrollCue) {
+        setTimeout(function () {
+          if (window.scrollY < 90) scrollCue.classList.add("visible");
+        }, 350);
+      }
+      gate.classList.add("hide");
+      setTimeout(function () {
+        gate.style.display = "none";
+      }, 900);
+      petalsCanvas.classList.add("active");
+      Petals.start();
+      ConfettiRain.start();
+      observeReveals();
+    }
+
+    function startEnvelope(e) {
+      if (opened) return;
+      if (started) {
+        if (Date.now() - startedAt > 1200) openInvite();
+        return;
+      }
+      started = true;
+      startedAt = Date.now();
+      gate.classList.add("playing");
+
+      let bx = window.innerWidth / 2;
+      let by = window.innerHeight * 0.45;
+      if (sealHotspot) {
+        const sr = sealHotspot.getBoundingClientRect();
+        bx = sr.left + sr.width / 2;
+        by = sr.top + sr.height / 2;
+      } else if (e && e.clientX) {
+        bx = e.clientX;
+        by = e.clientY;
+      }
+      GateFX.burst(bx, by);
+
+      audio.volume = 0.6;
+      const ap = audio.play();
+      if (ap && ap.then)
+        ap.then(function () {
+          setAudioIcon(true);
+        }).catch(function () {
+          setAudioIcon(false);
+        });
+
+      if (entryVideo) {
+        try {
+          entryVideo.currentTime = 0;
+        } catch (_) {}
+        const onTime = function () {
+          if (
+            entryVideo.duration &&
+            entryVideo.currentTime >= entryVideo.duration - 0.35
+          ) {
+            entryVideo.removeEventListener("timeupdate", onTime);
+            openInvite();
+          }
+        };
+        entryVideo.addEventListener("timeupdate", onTime);
+        entryVideo.addEventListener("ended", openInvite, { once: true });
+        const vp = entryVideo.play();
+        if (vp && vp.catch) {
+          vp.catch(function () {
+            setTimeout(openInvite, 650);
+          });
+        }
+        setTimeout(openInvite, 6500);
+      } else {
+        setTimeout(openInvite, 700);
+      }
+    }
+    gate.addEventListener("click", startEnvelope);
+
+    audioBtn.addEventListener("click", function () {
+      if (audio.paused) {
+        audio.play();
+        setAudioIcon(true);
+      } else {
+        audio.pause();
+        setAudioIcon(false);
+      }
+    });
+
+    if (scrollCue) {
+      scrollCue.addEventListener("click", function () {
+        const fam = document.getElementById("family-section");
+        if (fam) fam.scrollIntoView({ behavior: "smooth" });
+      });
+      window.addEventListener(
+        "scroll",
+        function () {
+          if (!opened) return;
+          scrollCue.classList.toggle("visible", window.scrollY < 90);
+        },
+        { passive: true }
+      );
+    }
+
+    /* ---------- SCROLL REVEAL ---------- */
+    function observeReveals() {
+      const els = document.querySelectorAll(".reveal");
+      if (!("IntersectionObserver" in window)) {
+        els.forEach(function (e) {
+          e.classList.add("revealed");
+        });
+        return;
+      }
+      const io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) {
+              en.target.classList.add("revealed");
+              io.unobserve(en.target);
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
+      els.forEach(function (e) {
+        io.observe(e);
+      });
+    }
+
+    /* ---------- PETALS (lightweight, max 18) ---------- */
+    const Petals = (function () {
+      const canvas = petalsCanvas,
+        ctx = canvas.getContext("2d");
+      const MAX = 18;
+      let petals = [],
+        sprites = [],
+        running = false,
+        last = 0,
+        w = 0,
+        h = 0,
+        dpr = 1;
+      const colors = [
+        "#F5C2C7",
+        "#F9D6DA",
+        "#F0CF8E",
+        "#F7B733",
+        "#E58C9B",
+        "#FCEFCF",
+      ];
+
+      function makeSprite(color) {
+        const s = 40,
+          c = document.createElement("canvas");
+        c.width = s;
+        c.height = s;
+        const g = c.getContext("2d");
+        g.translate(s / 2, s / 2);
+        const grad = g.createLinearGradient(0, -16, 0, 16);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, "rgba(255,255,255,0.75)");
+        g.fillStyle = grad;
+        g.globalAlpha = 0.9;
+        g.beginPath();
+        g.moveTo(0, -16);
+        g.bezierCurveTo(12, -10, 12, 8, 0, 16);
+        g.bezierCurveTo(-12, 8, -12, -10, 0, -16);
+        g.fill();
+        return c;
+      }
+      colors.forEach(function (c) {
+        sprites.push(makeSprite(c));
+      });
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = canvas.clientWidth;
+        h = canvas.clientHeight;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      function spawn(initial) {
+        return {
+          x: Math.random() * w,
+          y: initial ? Math.random() * h : -30,
+          size: 10 + Math.random() * 10,
+          vy: 12 + Math.random() * 16,
+          sway: 14 + Math.random() * 22,
+          swaySpeed: 0.4 + Math.random() * 0.5,
+          phase: Math.random() * Math.PI * 2,
+          rot: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.9,
+          sprite: sprites[(Math.random() * sprites.length) | 0],
+          alpha: 0.55 + Math.random() * 0.35,
+        };
+      }
+      function frame(t) {
+        if (!running) return;
+        const dt = Math.min((t - last) / 1000, 0.05);
+        last = t;
+        ctx.clearRect(0, 0, w, h);
+        for (let i = 0; i < petals.length; i++) {
+          let p = petals[i];
+          p.y += p.vy * dt;
+          p.phase += p.swaySpeed * dt;
+          p.rot += p.rotSpeed * dt;
+          const x = p.x + Math.sin(p.phase) * p.sway;
+          if (p.y > h + 30) {
+            petals[i] = p = spawn(false);
+            p.y = -30;
+          }
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.translate(x, p.y);
+          ctx.rotate(p.rot);
+          ctx.scale(1, 0.55 + 0.45 * Math.abs(Math.sin(p.phase * 0.8)));
+          ctx.drawImage(p.sprite, -p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        }
+        requestAnimationFrame(frame);
+      }
+      function start() {
+        if (running) return;
+        if (
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        )
+          return;
+        resize();
+        petals = [];
+        for (let i = 0; i < MAX; i++) petals.push(spawn(true));
+        running = true;
+        last = performance.now();
+        requestAnimationFrame(frame);
+      }
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) {
+          running = false;
+        } else if (opened && !running) {
+          running = true;
+          last = performance.now();
+          requestAnimationFrame(frame);
+        }
+      });
+      let rt;
+      window.addEventListener("resize", function () {
+        clearTimeout(rt);
+        rt = setTimeout(function () {
+          if (opened) resize();
+        }, 200);
+      });
+      return { start: start };
+    })();
+
+    /* ---------- CONFETTI RAIN ---------- */
+    const ConfettiRain = (function () {
+      let timer = null,
+        t0 = 0;
+      const cols = [
+        "#C9963E",
+        "#F0CF8E",
+        "#F5A623",
+        "#E58C9B",
+        "#F9C6CC",
+        "#FFFFFF",
+      ];
+      function drop() {
+        const wide = window.innerWidth > 900;
+        const heavy = Date.now() - t0 < 5000;
+        const n = (heavy ? 3 : 1) * (wide ? 2 : 1);
+        for (let i = 0; i < n; i++) {
+          cf({
+            particleCount: 1,
+            angle: 270,
+            spread: 30,
+            startVelocity: 4 + Math.random() * 5,
+            gravity: 0.45 + Math.random() * 0.25,
+            decay: 0.96,
+            drift: (Math.random() - 0.5) * 1.4,
+            ticks: 520,
+            scalar: 0.7 + Math.random() * 0.5,
+            origin: { x: Math.random(), y: -0.05 },
+            colors: cols,
+            disableForReducedMotion: true,
+          });
+        }
+      }
+      function start() {
+        if (timer) return;
+        t0 = Date.now();
+        timer = setInterval(drop, 130);
+      }
+      function stop() {
+        clearInterval(timer);
+        timer = null;
+      }
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) stop();
+        else if (opened) start();
+      });
+      return { start: start, stop: stop };
+    })();
+
+    /* ---------- SCRATCH HEARTS ---------- */
+    let revealedCount = 0;
+    const containers = document.querySelectorAll(".heart-container");
+
+    function initScratch(container) {
+      const canvas = container.querySelector(".scratch-canvas");
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      let done = false,
+        drawing = false,
+        lastPt = null,
+        moves = 0;
+      let W, H;
+
+      function paint() {
+        const rect = container.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = Math.max(1, Math.round(rect.width * dpr));
+        H = Math.max(1, Math.round(rect.height * dpr));
+        canvas.width = W;
+        canvas.height = H;
+        const g = ctx.createLinearGradient(0, 0, W, H);
+        g.addColorStop(0, "#F0CF8E");
+        g.addColorStop(0.5, "#C9963E");
+        g.addColorStop(1, "#F0CF8E");
+        ctx.globalCompositeOperation = "source-over";
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.font = "bold " + Math.round(W * 0.16) + "px serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("✦ ✦ ✦", W / 2, H * 0.45);
+      }
+      paint();
+
+      function pos(e) {
+        const r = canvas.getBoundingClientRect();
+        return {
+          x: (e.clientX - r.left) * (W / r.width),
+          y: (e.clientY - r.top) * (H / r.height),
+        };
+      }
+      function scratchTo(pt) {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.lineWidth = W * 0.2;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        if (lastPt) {
+          ctx.moveTo(lastPt.x, lastPt.y);
+          ctx.lineTo(pt.x, pt.y);
+        } else {
+          ctx.moveTo(pt.x, pt.y);
+          ctx.lineTo(pt.x + 0.1, pt.y + 0.1);
+        }
+        ctx.stroke();
+        lastPt = pt;
+      }
+      function checkCleared() {
+        if (done) return;
+        const data = ctx.getImageData(0, 0, W, H).data;
+        let total = 0,
+          clear = 0;
+        for (let i = 3; i < data.length; i += 64) {
+          total++;
+          if (data[i] < 20) clear++;
+        }
+        if (clear / total > 0.42) finish();
+      }
+      function finish() {
+        if (done) return;
+        done = true;
+        canvas.classList.add("done");
+        container.classList.add("done");
+        if (container.parentNode) container.parentNode.classList.add("done");
+        revealedCount++;
+        if (revealedCount === containers.length) onAllRevealed();
+      }
+      canvas.addEventListener("pointerdown", function (e) {
+        if (done) return;
+        drawing = true;
+        lastPt = null;
+        try {
+          canvas.setPointerCapture(e.pointerId);
+        } catch (_) {}
+        scratchTo(pos(e));
+        e.preventDefault();
+      });
+      canvas.addEventListener("pointermove", function (e) {
+        if (!drawing || done) return;
+        scratchTo(pos(e));
+        if (++moves % 6 === 0) checkCleared();
+        e.preventDefault();
+      });
+      function end() {
+        if (!drawing) return;
+        drawing = false;
+        lastPt = null;
+        checkCleared();
+      }
+      canvas.addEventListener("pointerup", end);
+      canvas.addEventListener("pointercancel", end);
+      canvas.addEventListener("pointerleave", end);
+    }
+    containers.forEach(initScratch);
+
+    /* ---------- ALL REVEALED ---------- */
+    function onAllRevealed() {
+      document.getElementById("surprise-message").classList.add("revealed");
+      document.getElementById("countdown").classList.add("revealed");
+      const gold = ["#C9963E", "#F0CF8E", "#FCEFCF", "#F5A623", "#E58C9B"];
+      cf({ particleCount: 110, spread: 80, origin: { y: 0.6 }, colors: gold });
+      setTimeout(function () {
+        cf({
+          particleCount: 60,
+          angle: 60,
+          spread: 60,
+          origin: { x: 0, y: 0.7 },
+          colors: gold,
+        });
+      }, 250);
+      setTimeout(function () {
+        cf({
+          particleCount: 60,
+          angle: 120,
+          spread: 60,
+          origin: { x: 1, y: 0.7 },
+          colors: gold,
+        });
+      }, 400);
+    }
+
+    const cd = {
+      d: document.getElementById("cd-days"),
+      h: document.getElementById("cd-hours"),
+      m: document.getElementById("cd-mins"),
+      s: document.getElementById("cd-secs"),
+    };
+    function pad(n) {
+      return String(n).padStart(2, "0");
+    }
+    function tick() {
+      const diff = Math.max(0, WEDDING_DATE - Date.now());
+      const s = Math.floor(diff / 1000);
+      cd.d.textContent = pad(Math.floor(s / 86400));
+      cd.h.textContent = pad(Math.floor((s % 86400) / 3600));
+      cd.m.textContent = pad(Math.floor((s % 3600) / 60));
+      const sec = pad(s % 60);
+      if (cd.s.textContent !== sec) {
+        cd.s.textContent = sec;
+        cd.s.classList.remove("bump");
+        void cd.s.offsetWidth;
+        cd.s.classList.add("bump");
+      }
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    /* ---------- RSVP ---------- */
+    const form = document.getElementById("rsvp-form");
+    const modal = document.getElementById("rsvp-modal");
+    const submitBtn = document.getElementById("submit-btn");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+
+      const defaultBtnText = "प्यार भेजें ❤️";
+      submitBtn.disabled = true;
+      submitBtn.textContent = "भेजा जा रहा है...";
+
+      fetch(GOOGLE_SHEET_URL, {
+        method: "POST",
+        body: new FormData(form),
+        mode: "no-cors",
+      })
+        .then(function () {
+          modal.classList.add("open");
+          form.reset();
+          cf({
+            particleCount: 70,
+            spread: 70,
+            origin: { y: 0.7 },
+            colors: ["#C9963E", "#F0CF8E", "#E58C9B"],
+          });
+        })
+        .catch(function (err) {
+          console.error("RSVP submit error:", err);
+          alert("कुछ गड़बड़ हो गई। कृपया दोबारा प्रयास करें।");
+        })
+        .then(function () {
+          submitBtn.disabled = false;
+          submitBtn.textContent = defaultBtnText;
+        });
+    });
+    document
+      .getElementById("modal-close")
+      .addEventListener("click", function () {
+        modal.classList.remove("open");
+      });
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) modal.classList.remove("open");
+    });
   }, []);
 
   return <div dangerouslySetInnerHTML={{ __html: BODY_HTML }} />;
