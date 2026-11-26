@@ -20,7 +20,7 @@ const BODY_HTML = `
 
   <div class="entry-stage" id="entry-stage">
     <div class="entry-video-frame" id="entry-card">
-      <video id="entry-video" src="media/reveal1.mp4" playsinline webkit-playsinline muted preload="auto"></video>
+      <video id="entry-video" src="media/reveal1.mp4" poster="images/envelope_poster.jpg" playsinline webkit-playsinline muted preload="auto"></video>
       <div class="card-sheen" id="card-sheen"></div>
       <div class="card-inner-border"></div>
 
